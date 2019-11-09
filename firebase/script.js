@@ -56,12 +56,16 @@ function addImageToGallery(src) {
   galleryHTML.appendChild(imgNode);
 }
 
+/**
+ * PushNewUserToFirebase Function
+ * 
+ * @param {*} user 
+ */
 function pushNewUserToFirebase(user) {
-  db.collection("users").add({
-    email: user.email,
+  db.collection("users").doc(user.email).set({
     name: user.displayName
-  }).then(function(docRef) {
-    console.log("Document written with ID: ", docRef.id);
+  }).then(function() {
+    console.log("Document written with ID: ", user.email);
   }).catch(function(error) {
     console.error("Error adding document: ", error);
   });
@@ -71,11 +75,9 @@ function pushNewUserToFirebase(user) {
  * DiplayGallery Function
  */
 function displayGallery() {
-  db.collection("users").where("email", "==", "thatonedraffan@gmail.com").get().then(function(querySnapshot) {
-    querySnapshot.forEach(function(doc) {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-    });
+  db.collection("users").doc("thatonedraffan@gmail.com").get().then(function(querySnapshot) {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
   }).catch(function(error) {
     console.log("Error getting documents: ", error);
   });
@@ -86,14 +88,19 @@ function displayGallery() {
  * 
  * @param {*} email 
  */
-function userExists(email) {
-  db.collection("users").where("email", "==", email).get().then(function(doc) {
-    if (doc.exists) {
-      console.log(doc.id, " => ", doc.data());
-      return true;
-    } else {
-      return false;
+function userExists(user) {
+  var exists = db.collection("users").doc(user.email).get().then(function(doc) {
+    if (!doc.exists) {
+      pushNewUserToFirebase(user);
     }
+    return doc.exists;
+    /*results = querySnapshot.forEach(function(doc) {
+      console.log(doc.id, " => ", doc.data());
+      var docEmail = doc.data().email;
+      if (docEmail === userEmail) {
+        exists = true;
+      }
+    });*/
   });
 }
 
@@ -112,14 +119,18 @@ window.onload = function() {
 
   firebase.auth().useDeviceLanguage();
   firebase.auth().signInWithPopup(auth).then(function(result) {
+    
     // this gives us a Google Access Token for accessing the Google api
     var token = result.credential.accessToken;
+
     // the signed-in user info
     var user = result.user;
 
-    if (!userExists(user.email)) {
-      pushNewUserToFirebase(user);
-    }
+    // check to see if the user is already in our Firestore
+    // if they are not, then we need to add them
+    // we store userdata in Firestore to enable picture references
+    // to be linked with a specific user
+    userExists(user);
   }).catch(function(error) {
     // handle errors here
     var errorCode = error.code;
