@@ -106,3 +106,61 @@
 [debug] [2019-11-09T07:37:44.193Z] <<< HTTP RESPONSE 200
 [info] i  hosting: Serving hosting files from: ./
 [info] +  hosting: Local server: http://localhost:5000
+[debug] [2019-11-09T16:14:05.452Z] ----------------------------------------------------------------------
+[debug] [2019-11-09T16:14:05.455Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\bmr54\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve
+[debug] [2019-11-09T16:14:05.455Z] CLI Version:   7.7.0
+[debug] [2019-11-09T16:14:05.455Z] Platform:      win32
+[debug] [2019-11-09T16:14:05.455Z] Node Version:  v12.13.0
+[debug] [2019-11-09T16:14:05.457Z] Time:          Sat Nov 09 2019 10:14:05 GMT-0600 (Central Standard Time)
+[debug] [2019-11-09T16:14:05.457Z] ----------------------------------------------------------------------
+[debug] [2019-11-09T16:14:05.457Z] 
+[debug] [2019-11-09T16:14:05.470Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-11-09T16:14:05.471Z] > authorizing via signed-in user
+[debug] [2019-11-09T16:14:05.471Z] [iam] checking project neuralnet-style-transfer-util for permissions ["firebase.projects.get"]
+[debug] [2019-11-09T16:14:05.473Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-11-09T16:14:05.473Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-11-09T16:14:05.719Z] <<< HTTP RESPONSE 200
+[debug] [2019-11-09T16:14:05.727Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/neuralnet-style-transfer-util:testIamPermissions  
+
+[debug] [2019-11-09T16:14:05.944Z] <<< HTTP RESPONSE 200
+[debug] [2019-11-09T16:14:05.946Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/neuralnet-style-transfer-util  
+ 
+[debug] [2019-11-09T16:14:06.243Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'F:\neural_network_style_transfer_utility\firebase'...
+[info] 
+[debug] [2019-11-09T16:14:06.247Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/neuralnet-style-transfer-util/webApps/-/config  
+ 
+[debug] [2019-11-09T16:14:06.587Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] +  hosting: Local server: http://localhost:5000
+[debug] [2019-11-09T19:20:28.693Z] ----------------------------------------------------------------------
+[debug] [2019-11-09T19:20:28.695Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\bmr54\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js serve
+[debug] [2019-11-09T19:20:28.695Z] CLI Version:   7.7.0
+[debug] [2019-11-09T19:20:28.695Z] Platform:      win32
+[debug] [2019-11-09T19:20:28.695Z] Node Version:  v12.13.0
+[debug] [2019-11-09T19:20:28.699Z] Time:          Sat Nov 09 2019 13:20:28 GMT-0600 (Central Standard Time)
+[debug] [2019-11-09T19:20:28.699Z] ----------------------------------------------------------------------
+[debug] [2019-11-09T19:20:28.699Z] 
+[debug] [2019-11-09T19:20:28.717Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-11-09T19:20:28.718Z] > authorizing via signed-in user
+[debug] [2019-11-09T19:20:28.719Z] [iam] checking project neuralnet-style-transfer-util for permissions ["firebase.projects.get"]
+[debug] [2019-11-09T19:20:28.721Z] > refreshing access token with scopes: ["email","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","openid"]
+[debug] [2019-11-09T19:20:28.721Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2019-11-09T19:20:28.963Z] <<< HTTP RESPONSE 200
+[debug] [2019-11-09T19:20:28.974Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/neuralnet-style-transfer-util:testIamPermissions  
+
+[debug] [2019-11-09T19:20:29.186Z] <<< HTTP RESPONSE 200
+[debug] [2019-11-09T19:20:29.188Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/neuralnet-style-transfer-util  
+ 
+[debug] [2019-11-09T19:20:29.469Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Serving from 'F:\neural_network_style_transfer_utility\firebase'...
+[info] 
+[debug] [2019-11-09T19:20:29.471Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/neuralnet-style-transfer-util/webApps/-/config  
+ 
+[debug] [2019-11-09T19:20:30.073Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: ./
+[info] +  hosting: Local server: http://localhost:5000

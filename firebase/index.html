@@ -21,33 +21,21 @@ limitations under the License.
   <title>Firebase SDK for Cloud Storage Quickstart</title>
 </head>
 <body>
-  <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
-    <main class="mdl-layout__content mdl-color--grey-100">
-      <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
-
-        <!-- Container for the demo -->
-        <div class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
-          <div class="mdl-card__title mdl-color--light-blue-600 mdl-color-text--white">
-            <h2 class="mdl-card__title-text">Upload a file</h2>
-          </div>
-          <div class="mdl-card__supporting-text mdl-color-text--grey-600" id="messagesDiv">
-            <p>Select a file below. When it is uploaded, a link will be displayed to the uploaded file.</p>
-            <h6>Choose File</h6>
-            <input type="file" id="file" name="file"/>
-            <h6>File URL:</h6>
-            <span id="linkbox"></span>
-          </div>
-        </div>
-      </div>
-    </main>
+  <div>
+    <h6>Choose File</h6>
+    <input type="file" id="file" name="file"/>
+    <button id="galleryBtn">View Gallery</button>
+    <span id="linkbox"></span>
   </div>
+  <div class="gallery" id="gallery"></div>
 
   <!-- Import and configure the Firebase SDK -->
   <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
   <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-  <script src="/__/firebase/7.2.3/firebase-app.js"></script>
-  <script src="/__/firebase/7.2.3/firebase-auth.js"></script>
-  <script src="/__/firebase/7.2.3/firebase-storage.js"></script>
+  <script src="/__/firebase/7.3.0/firebase-app.js"></script>
+  <script src="/__/firebase/7.3.0/firebase-auth.js"></script>
+  <script src="/__/firebase/7.3.0/firebase-storage.js"></script>
+  <script src="/__/firebase/7.3.0/firebase-firestore.js"></script>
   <script src="/__/firebase/init.js"></script>
 
   <script src="script.js"></script>
