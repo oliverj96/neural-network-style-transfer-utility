@@ -12,6 +12,7 @@ function handleFileSelect(evt) {
   evt.stopPropagation();
   evt.preventDefault();
   var file = evt.target.files[0];
+  console.log("File to Upload: " + file);
   pushFileToFirebase(file);
 }
 
