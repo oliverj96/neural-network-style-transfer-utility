@@ -32,13 +32,29 @@ function pushFileToFirebase(file) {
     
     // let's grab the download url
     snapshot.ref.getDownloadURL().then(function(url) {
-      addImageToGallery(url);
+      // and attach that image url to the user's firestore
+      attachImageToUser(url);
     });
 
   }).catch(function(error) {
     // [START onfailure]
     console.error('Upload failed:', error);
     // [END onfailure]
+  });
+}
+
+/**
+ * 
+ * 
+ * @param {*} src 
+ */
+function attachImageToUser(src) {
+  db.collection("users").doc(currentUser.email).collection("images").add({
+    image: src
+  }).then(function() {
+    console.log("Document written with user ID: ", currentUser.email);
+  }).catch(function(error) {
+    console.error("Error adding document: ", error);
   });
 }
 
@@ -75,9 +91,12 @@ function pushNewUserToFirebase(user) {
  * DiplayGallery Function
  */
 function displayGallery() {
-  db.collection("users").doc("thatonedraffan@gmail.com").get().then(function(querySnapshot) {
-    // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
+  db.collection("users").doc(currentUser.email).collection("images").get().then(function(querySnapshot) {
+    querySnapshot.forEach(function(doc) {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      addImageToGallery(doc.data().image);
+    });
   }).catch(function(error) {
     console.log("Error getting documents: ", error);
   });
@@ -90,17 +109,7 @@ function displayGallery() {
  */
 function userExists(user) {
   var exists = db.collection("users").doc(user.email).get().then(function(doc) {
-    if (!doc.exists) {
-      pushNewUserToFirebase(user);
-    }
-    return doc.exists;
-    /*results = querySnapshot.forEach(function(doc) {
-      console.log(doc.id, " => ", doc.data());
-      var docEmail = doc.data().email;
-      if (docEmail === userEmail) {
-        exists = true;
-      }
-    });*/
+    if (!doc.exists) pushNewUserToFirebase(user);
   });
 }
 
@@ -125,6 +134,7 @@ window.onload = function() {
 
     // the signed-in user info
     var user = result.user;
+    currentUser = user;
 
     // check to see if the user is already in our Firestore
     // if they are not, then we need to add them
@@ -132,11 +142,14 @@ window.onload = function() {
     // to be linked with a specific user
     userExists(user);
   }).catch(function(error) {
+
     // handle errors here
     var errorCode = error.code;
     var errorMessage = error.message;
+
     // The email of the user's account used.
     var email = error.email;
+
     // The firebase.auth.AuthCredential type that was used.
     var credential = error.credential;
   });
