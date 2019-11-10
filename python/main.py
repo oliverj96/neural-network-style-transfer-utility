@@ -50,8 +50,8 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
-style_img = image_loader("./images/goldlab.jpg")
-content_img = image_loader("./images/guy.jpg")
+style_img = image_loader("./images/style.jpg")
+content_img = image_loader("./images/content.jpg")
 
 assert style_img.size() == content_img.size(), \
        "we need to import style and content imsages of the same size"
@@ -209,9 +209,9 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     return model, style_losses, content_losses
 
 # select the input image
-# input_img = content_img.clone()
+input_img = content_img.clone()
 # if you want to use white noise instead uncomment the below line:
-input_img = torch.randn(content_img.data.size(), device=device)
+# input_img = torch.randn(content_img.data.size(), device=device)
 
 # add the original input image to the figure:
 plt.figure()
@@ -265,7 +265,6 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
                 print()
                 imshow(input_img, title='Run {}'.format(run))
                 imsave('run/run{}.jpg'.format(run), input_img)
-                imsave('output/output.jpg', input_img)
 
             return style_score + content_score
 
