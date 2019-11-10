@@ -23,15 +23,15 @@ function pushFileToFirebase(file) {
   var storageRef = firebase.storage().ref("images/" + file.name)
 
   // push the file to firebase storage
-  storageRef.put(file).then(function(snapshot) {
-    console.log("Uploaded file " +  file.name + " with size of " + snapshot.totalBytes + " bytes.");
-    
+  storageRef.put(file).then(function (snapshot) {
+    console.log("Uploaded file " + file.name + " with size of " + snapshot.totalBytes + " bytes.");
+
     // let's grab the download url...
-    snapshot.ref.getDownloadURL().then(function(url) {
+    snapshot.ref.getDownloadURL().then(function (url) {
       // ...and attach that image url to the users' Firestore subcollections
       attachImageToUser(url);
     });
-  }).catch(function(error) {
+  }).catch(function (error) {
     console.error("Upload failed:", error);
   });
 }
@@ -44,9 +44,9 @@ function pushFileToFirebase(file) {
 function attachImageToUser(src) {
   db.collection("users").doc(currentUser.email).collection("images").add({
     image: src
-  }).then(function() {
+  }).then(function () {
     console.log("Document written with user ID: ", currentUser.email);
-  }).catch(function(error) {
+  }).catch(function (error) {
     console.error("Error adding document: ", error);
   });
 }
@@ -70,9 +70,9 @@ function addImageToGallery(src) {
 function pushNewUserToFirebase(user) {
   db.collection("users").doc(user.email).set({
     name: user.displayName
-  }).then(function() {
+  }).then(function () {
     console.log("Document written with ID: ", user.email);
-  }).catch(function(error) {
+  }).catch(function (error) {
     console.error("Error adding document: ", error);
   });
 }
@@ -82,13 +82,13 @@ function pushNewUserToFirebase(user) {
  * to be written to the viewable HTML page
  */
 function displayGallery() {
-  db.collection("users").doc(currentUser.email).collection("images").get().then(function(querySnapshot) {
-    querySnapshot.forEach(function(doc) {
+  db.collection("users").doc(currentUser.email).collection("images").get().then(function (querySnapshot) {
+    querySnapshot.forEach(function (doc) {
       // doc.data() is never undefined for query doc snapshots
       console.log(doc.id, " => ", doc.data());
       addImageToGallery(doc.data().image);
     });
-  }).catch(function(error) {
+  }).catch(function (error) {
     console.log("Error getting documents: ", error);
   });
 }
@@ -99,7 +99,7 @@ function displayGallery() {
  * @param {object} user - User JS object retrieved from the Google login API
  */
 function userExists(user) {
-  var exists = db.collection("users").doc(user.email).get().then(function(doc) {
+  var exists = db.collection("users").doc(user.email).get().then(function (doc) {
     if (!doc.exists) pushNewUserToFirebase(user);
   });
 }
@@ -107,7 +107,7 @@ function userExists(user) {
 /**
  * Runs when the window is loaded to preform initial setup code such as event listeners.
  */
-window.onload = function() {
+window.onload = function () {
 
   // add event listeners to the file selector and gallery buttons
   this.document.getElementById("file").addEventListener("change", handleFileSelect, false);
@@ -116,8 +116,8 @@ window.onload = function() {
   var providerGoogle = new firebase.auth.GoogleAuthProvider(); // login with Google
 
   firebase.providerGoogle().useDeviceLanguage();
-  firebase.providerGoogle().signInWithPopup(providerGoogle).then(function(result) {
-    
+  firebase.providerGoogle().signInWithPopup(providerGoogle).then(function (result) {
+
     // this gives us a Google Access Token for accessing the Google API
     var token = result.credential.accessToken;
 
@@ -129,7 +129,7 @@ window.onload = function() {
     // we store userdata in Firestore to enable picture references
     // to be linked with a specific user
     userExists(currentUser);
-  }).catch(function(error) {
+  }).catch(function (error) {
 
     // handle errors here
     var errorCode = error.code;
