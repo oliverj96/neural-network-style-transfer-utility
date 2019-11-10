@@ -4,3 +4,7 @@
 *.cache
 
 firebase/jsdoc/
+
+python/run/
+
+python/output/

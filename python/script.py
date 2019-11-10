@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim # efficient gradient descents
+import numpy as np
 
 # load and display images
 from PIL import Image
@@ -203,7 +204,7 @@ def get_input_optimizer(input_img):
     return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=600,
+                       content_img, style_img, input_img, num_steps=1,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
@@ -216,7 +217,7 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     while run[0] <= num_steps:
 
         def closure():
-            # correc the values of updated input image
+            # correct the values of updated input image
             input_img.data.clamp_(0, 1)
 
             optimizer.zero_grad()
@@ -236,11 +237,14 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
             loss.backward()
 
             run[0] += 1
-            if run[0] % 50 == 0:
-                print("run {}:".format(run))
-                print('Style Loss : {:4f} Content Loss: {:4f}'.format(
-                    style_score.item(), content_score.item()))
-                print()
+            print("run {}:".format(run))
+            print('Style Loss : {:4f} Content Loss: {:4f}'.format(
+                style_score.item(), content_score.item()))
+            print()
+
+            imshow(input_img, title='Run {}'.format(run))
+            print(type(input_img.detach()))
+            plt.imsave('run/run{}.jpg'.format(run), input_img.detach(), format='jpg')
 
             return style_score + content_score
 
@@ -256,11 +260,11 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
 output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
                             content_img, style_img, input_img)
 
-plt.figure()
 imshow(output, title='Output Image')
+plt.imsave('output/output.jpg', output.detach(), format='jpg')
 
 # sphinx_gallery_thumbnail_number = 4
-plt.ioff()
-plt.show()
+# plt.ioff()
+# plt.show()
 
 input("Press enter to continue...")
