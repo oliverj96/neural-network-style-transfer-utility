@@ -1,0 +1,12 @@
+
+*.log
+
+*.cache
+
+firebase/jsdoc/
+
+python/run/
+
+python/output/
+
+python/serviceAccountKey.json
