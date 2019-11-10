@@ -1,6 +1,12 @@
 from __future__ import print_function
 
-#packages for neural networks with PyTorch
+# packages for hooking up to firebase
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
+from firebase_admin import storage
+
+# packages for neural networks with PyTorch
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,6 +21,15 @@ import torchvision.transforms as transforms # trans PIL imgs into tensors
 import torchvision.models as models # train/load pre-trained models
 
 import copy # to deep copy models
+
+# --- FIREBASE LINKING ---
+
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'neuralnet-style-transfer-util.appspot.com'
+})
+db = firestore.client()
+bucket = storage.bucket()
 
 # running on a gpu would provide better performance/results, but a cpu will
 # work if that's all we have accessible
@@ -35,8 +50,8 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
-style_img = image_loader("./images/picasso.jpg")
-content_img = image_loader("./images/dancing.jpg")
+style_img = image_loader("./images/goldlab.jpg")
+content_img = image_loader("./images/guy.jpg")
 
 assert style_img.size() == content_img.size(), \
        "we need to import style and content imsages of the same size"
@@ -194,9 +209,9 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     return model, style_losses, content_losses
 
 # select the input image
-input_img = content_img.clone()
+# input_img = content_img.clone()
 # if you want to use white noise instead uncomment the below line:
-# input_img = torch.randn(content_img.data.size(), device=device)
+input_img = torch.randn(content_img.data.size(), device=device)
 
 # add the original input image to the figure:
 plt.figure()
@@ -210,7 +225,7 @@ def get_input_optimizer(input_img):
     return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=300,
+                       content_img, style_img, input_img, num_steps=50,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
@@ -250,6 +265,7 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
                 print()
                 imshow(input_img, title='Run {}'.format(run))
                 imsave('run/run{}.jpg'.format(run), input_img)
+                imsave('output/output.jpg', input_img)
 
             return style_score + content_score
 
