@@ -54,6 +54,12 @@ def imshow(tensor, title=None):
         plt.title(title)
     plt.pause(0.001) # pause a bit so that plots are updated
 
+def imsave(path, tensor):
+    image = tensor.cpu().clone()
+    image = image.squeeze(0)
+    image = unloader(image)
+    image.save(path)
+
 plt.figure()
 imshow(style_img, title='Style Image')
 
@@ -204,7 +210,7 @@ def get_input_optimizer(input_img):
     return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=1,
+                       content_img, style_img, input_img, num_steps=300,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
@@ -237,14 +243,13 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
             loss.backward()
 
             run[0] += 1
-            print("run {}:".format(run))
-            print('Style Loss : {:4f} Content Loss: {:4f}'.format(
-                style_score.item(), content_score.item()))
-            print()
-
-            imshow(input_img, title='Run {}'.format(run))
-            print(type(input_img.detach()))
-            plt.imsave('run/run{}.jpg'.format(run), input_img.detach(), format='jpg')
+            if run[0] % 5 == 0:
+                print("run {}:".format(run))
+                print('Style Loss : {:4f} Content Loss: {:4f}'.format(
+                    style_score.item(), content_score.item()))
+                print()
+                imshow(input_img, title='Run {}'.format(run))
+                imsave('run/run{}.jpg'.format(run), input_img)
 
             return style_score + content_score
 
@@ -261,7 +266,7 @@ output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
                             content_img, style_img, input_img)
 
 imshow(output, title='Output Image')
-plt.imsave('output/output.jpg', output.detach(), format='jpg')
+imsave('output/output.jpg', output)
 
 # sphinx_gallery_thumbnail_number = 4
 # plt.ioff()
