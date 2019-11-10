@@ -23,8 +23,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # --- LOADING THE IMAGES ----
 
 # desired size of the output image
-#imsize = 512 if torch.cuda.is_available() else 256 # use small size if no gpu
-imsize = 360
+imsize = 512 if torch.cuda.is_available() else 256 # use small size if no gpu
 
 loader = transforms.Compose([
     transforms.Resize(imsize), # scale imported image
@@ -36,8 +35,11 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
-style_img = image_loader("./images/wheatfield.jpg")
-content_img = image_loader("./images/mypic.jpg")
+style_path = input("Path to Style: ")
+content_path = input("Path to Content: ")
+
+style_img = image_loader(style_path)
+content_img = image_loader(content_path)
 
 assert style_img.size() == content_img.size(), \
        "we need to import style and content imsages of the same size"
@@ -129,7 +131,7 @@ class Normalization(nn.Module):
         # normalize img
         return (img - self.mean) / self.std
 
-# desired depth layers to compute style/content lossess :
+# desired depth layers to compute style/content losses :
 content_layers_default = ['conv_4']
 style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
@@ -194,10 +196,16 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 
     return model, style_losses, content_losses
 
+input_path = input("Input Image Path: ")
+
+if input_path == "noise":
+	input_img = torch.randn(content_img.data.size(), device=device)
+else:
+	input_img = image_loader(input_path)
+
 # select the input image
-input_img = content_img.clone()
+# input_img = content_img.clone()
 # if you want to use white noise instead uncomment the below line:
-# input_img = torch.randn(content_img.data.size(), device=device)
 
 # add the original input image to the figure:
 plt.figure()
@@ -263,8 +271,9 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
 
 # --- RUNNING THE ALGORITHM ---
 
+num_steps = int(input("Number of Steps: "))
 output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
-                            content_img, style_img, input_img)
+                            content_img, style_img, input_img, num_steps)
 
 imshow(output, title='Output Image')
 imsave('output/output.jpg', output)
