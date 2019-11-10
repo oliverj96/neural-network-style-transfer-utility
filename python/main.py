@@ -1,11 +1,5 @@
 from __future__ import print_function
 
-# packages for hooking up to firebase
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-from firebase_admin import storage
-
 # packages for neural networks with PyTorch
 import torch
 import torch.nn as nn
@@ -22,15 +16,6 @@ import torchvision.models as models # train/load pre-trained models
 
 import copy # to deep copy models
 
-# --- FIREBASE LINKING ---
-
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'neuralnet-style-transfer-util.appspot.com'
-})
-db = firestore.client()
-bucket = storage.bucket()
-
 # running on a gpu would provide better performance/results, but a cpu will
 # work if that's all we have accessible
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -38,7 +23,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # --- LOADING THE IMAGES ----
 
 # desired size of the output image
-imsize = 512 if torch.cuda.is_available() else 128 # use small size if no gpu
+#imsize = 512 if torch.cuda.is_available() else 256 # use small size if no gpu
+imsize = 360
 
 loader = transforms.Compose([
     transforms.Resize(imsize), # scale imported image
@@ -50,8 +36,8 @@ def image_loader(image_name):
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
 
-style_img = image_loader("./images/style.jpg")
-content_img = image_loader("./images/content.jpg")
+style_img = image_loader("./images/wheatfield.jpg")
+content_img = image_loader("./images/mypic.jpg")
 
 assert style_img.size() == content_img.size(), \
        "we need to import style and content imsages of the same size"
@@ -225,7 +211,7 @@ def get_input_optimizer(input_img):
     return optimizer
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
-                       content_img, style_img, input_img, num_steps=50,
+                       content_img, style_img, input_img, num_steps=300,
                        style_weight=1000000, content_weight=1):
     """Run the style transfer."""
     print('Building the style transfer model..')
