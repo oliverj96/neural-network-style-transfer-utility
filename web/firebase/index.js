@@ -52,18 +52,6 @@ function attachImageToUser(src) {
 }
 
 /**
- * Writes an image to the viewable HTML page using a given downloaded source URL
- * from Firebase Storage
- * @param {string} src - Firebase Storage download URL for an image
- */
-function addImageToGallery(src) {
-  var galleryHTML = document.getElementById("gallery");
-  var imgNode = document.createElement("img");
-  imgNode.setAttribute("src", src);
-  galleryHTML.appendChild(imgNode);
-}
-
-/**
  * Creates a new document under the users collection in Firestore for new users
  * @param {object} user 
  */
@@ -74,22 +62,6 @@ function pushNewUserToFirebase(user) {
     console.log("Document written with ID: ", user.email);
   }).catch(function (error) {
     console.error("Error adding document: ", error);
-  });
-}
-
-/**
- * Pulls all the images assigned to a user from Firestore and calls for the images 
- * to be written to the viewable HTML page
- */
-function displayGallery() {
-  db.collection("users").doc(currentUser.email).collection("images").get().then(function (querySnapshot) {
-    querySnapshot.forEach(function (doc) {
-      // doc.data() is never undefined for query doc snapshots
-      console.log(doc.id, " => ", doc.data());
-      addImageToGallery(doc.data().image);
-    });
-  }).catch(function (error) {
-    console.log("Error getting documents: ", error);
   });
 }
 
@@ -111,12 +83,11 @@ window.onload = function () {
 
   // add event listeners to the file selector and gallery buttons
   this.document.getElementById("file").addEventListener("change", handleFileSelect, false);
-  this.document.getElementById("galleryBtn").addEventListener("click", displayGallery);
 
   var providerGoogle = new firebase.auth.GoogleAuthProvider(); // login with Google
 
-  firebase.providerGoogle().useDeviceLanguage();
-  firebase.providerGoogle().signInWithPopup(providerGoogle).then(function (result) {
+  firebase.auth().useDeviceLanguage();
+  firebase.auth().signInWithPopup(providerGoogle).then(function (result) {
 
     // this gives us a Google Access Token for accessing the Google API
     var token = result.credential.accessToken;
