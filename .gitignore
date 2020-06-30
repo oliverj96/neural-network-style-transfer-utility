@@ -3,10 +3,9 @@
 
 *.cache
 
-firebase/jsdoc/
+run/
 
-python/run/
+output/
 
-python/output/
-
-python/serviceAccountKey.json
+/.vscode
+buglist.md
