@@ -4,17 +4,17 @@ from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim # efficient gradient descents
-import numpy as np
+import torch.optim as optim   # efficient gradient descents
+# import numpy as np
 
 # load and display images
 from PIL import Image
 import matplotlib.pyplot as plt
 
-import torchvision.transforms as transforms # trans PIL imgs into tensors
-import torchvision.models as models # train/load pre-trained models
+import torchvision.transforms as transforms  # trans PIL imgs into tensors
+import torchvision.models as models  # train/load pre-trained models
 
-import copy # to deep copy models
+import copy  # to deep copy models
 
 # running on a gpu would provide better performance/results, but a cpu will
 # work if that's all we have accessible
@@ -27,14 +27,16 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 imsize = int(input("Image Size: "))
 
 loader = transforms.Compose([
-    transforms.Resize(imsize), # scale imported image
-    transforms.ToTensor()]) # transform it into a torch tensor
+    transforms.Resize(imsize),  # scale imported image
+    transforms.ToTensor()])  # transform it into a torch tensor
+
 
 def image_loader(image_name):
     image = Image.open(image_name)
     # fake batch dimension required to fit network's input dimensions
     image = loader(image).unsqueeze(0)
     return image.to(device, torch.float)
+
 
 style_path = input("Path to Style: ")
 content_path = input("Path to Content: ")
@@ -43,26 +45,29 @@ style_img = image_loader(style_path)
 content_img = image_loader(content_path)
 
 assert style_img.size() == content_img.size(), \
-       "we need to import style and content imsages of the same size"
+    "we need to import style and content imsages of the same size"
 
-unloader = transforms.ToPILImage() # reconvert into PIL image
+unloader = transforms.ToPILImage()  # reconvert into PIL image
 
 plt.ion()
 
+
 def imshow(tensor, title=None):
-    image = tensor.cpu().clone() # we clone the tensor to not do changes on it
-    image = image.squeeze(0) # remove the fake batch dimension
+    image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
+    image = image.squeeze(0)  # remove the fake batch dimension
     image = unloader(image)
     plt.imshow(image)
     if title is not None:
         plt.title(title)
-    plt.pause(0.001) # pause a bit so that plots are updated
+    plt.pause(0.001)  # pause a bit so that plots are updated
+
 
 def imsave(path, tensor):
     image = tensor.cpu().clone()
     image = image.squeeze(0)
     image = unloader(image)
     image.save(path)
+
 
 plt.figure()
 imshow(style_img, title='Style Image')
@@ -71,6 +76,7 @@ plt.figure()
 imshow(content_img, title='Content Image')
 
 # --- LOSS FUNCTIONS ---
+
 
 class ContentLoss(nn.Module):
 
@@ -86,18 +92,20 @@ class ContentLoss(nn.Module):
         self.loss = F.mse_loss(input, self.target)
         return input
 
+
 def gram_matrix(input):
-    a, b, c, d = input.size() # a=batch size(=1)
+    a, b, c, d = input.size()  # a=batch size(=1)
     # b=number of feature maps
     # (c,d)=dimensions of a f. map (N=c*d)
 
-    features = input.view(a * b, c * d) # resise F_XL into /hat F_XL
+    features = input.view(a * b, c * d)  # resise F_XL into /hat F_XL
 
-    G = torch.mm(features, features.t()) # compute the gram product
+    G = torch.mm(features, features.t())  # compute the gram product
 
     # we normalize the values of the gram matrix
     # by dividing the number of element in each feature maps
     return G.div(a * b * c * d)
+
 
 class StyleLoss(nn.Module):
 
@@ -112,6 +120,7 @@ class StyleLoss(nn.Module):
 
 # --- IMPORTING THE MODEL ---
 
+
 cnn = models.vgg19(pretrained=True).features.to(device).eval()
 
 cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
@@ -119,6 +128,8 @@ cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
 
 # create a module to normalize input image so we can easily put it in a
 # nn.Sequential
+
+
 class Normalization(nn.Module):
     def __init__(self, mean, std):
         super(Normalization, self).__init__()
@@ -132,9 +143,11 @@ class Normalization(nn.Module):
         # normalize img
         return (img - self.mean) / self.std
 
+
 # desired depth layers to compute style/content losses :
 content_layers_default = ['conv_4']
 style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
+
 
 def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
                                style_img, content_img,
@@ -143,7 +156,8 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     cnn = copy.deepcopy(cnn)
 
     # normalization module
-    normalization = Normalization(normalization_mean, normalization_std).to(device)
+    normalization = Normalization(
+        normalization_mean, normalization_std).to(device)
 
     # just in order to have an iterable access to or list of content/style
     # lossess
@@ -154,14 +168,15 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
     # to put in modules that are supposed to be activated sequentially
     model = nn.Sequential(normalization)
 
-    i = 0 # increment every time we see a conv
+    i = 0  # increment every time we see a conv
     for layer in cnn.children():
         if isinstance(layer, nn.Conv2d):
             i += 1
             name = 'conv_{}'.format(i)
         elif isinstance(layer, nn.ReLU):
             name = 'relu_{}'.format(i)
-            # The in-place version doesn't play very nicely with the ContentLoss
+            # The in-place version doesn't play
+            # very nicely with the ContentLoss
             # and StyleLoss we insert below. So we replace with out-of-place
             # ones here.
             layer = nn.ReLU(inplace=False)
@@ -170,7 +185,8 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
         elif isinstance(layer, nn.BatchNorm2d):
             name = 'bn_{}'.format(i)
         else:
-            raise RuntimeError('Unrecognized layer: {}'.format(layer.__class__.__name__))
+            raise RuntimeError('Unrecognized layer: {}'.format(
+                layer.__class__.__name__))
 
         model.add_module(name, layer)
 
@@ -188,7 +204,8 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
             model.add_module("style_loss_{}".format(i), style_loss)
             style_losses.append(style_loss)
 
-    # now we trim off the layers after the last content and style losses
+    # now we trim off the layers after
+    # the last content and style losses
     for i in range(len(model) - 1, -1, -1):
         if isinstance(model[i], ContentLoss) or isinstance(model[i], StyleLoss):
             break
@@ -197,12 +214,13 @@ def get_style_model_and_losses(cnn, normalization_mean, normalization_std,
 
     return model, style_losses, content_losses
 
+
 input_path = input("Input Image Path: ")
 
 if input_path == "noise":
-	input_img = torch.randn(content_img.data.size(), device=device)
+    input_img = torch.randn(content_img.data.size(), device=device)
 else:
-	input_img = image_loader(input_path)
+    input_img = image_loader(input_path)
 
 # select the input image
 # input_img = content_img.clone()
@@ -214,10 +232,12 @@ imshow(input_img, title='Input Image')
 
 # --- GRADIENT DESCENT ---
 
+
 def get_input_optimizer(input_img):
     # this line to show that input is a parameter that requires a gradient
     optimizer = optim.LBFGS([input_img.requires_grad_()])
     return optimizer
+
 
 def run_style_transfer(cnn, normalization_mean, normalization_std,
                        content_img, style_img, input_img, num_steps=300,
@@ -225,7 +245,7 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     """Run the style transfer."""
     print('Building the style transfer model..')
     model, style_losses, content_losses = get_style_model_and_losses(cnn,
-        normalization_mean, normalization_std, style_img, content_img)
+                                                                     normalization_mean, normalization_std, style_img, content_img)
     optimizer = get_input_optimizer(input_img)
 
     print('Optimizing..')
@@ -271,6 +291,7 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     return input_img
 
 # --- RUNNING THE ALGORITHM ---
+
 
 num_steps = int(input("Number of Steps: "))
 output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
