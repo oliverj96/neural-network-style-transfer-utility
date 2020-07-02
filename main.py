@@ -222,88 +222,83 @@ def run_style_transfer(cnn, normalization_mean, normalization_std,
     return input_img
 
 
-# running on a gpu would provide better performance/results, but a cpu will
-# work if that's all we have accessible
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if __name__ == "__main__":
+    # running on a gpu would provide better performance/results, but a cpu will
+    # work if that's all we have accessible
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# --- LOADING THE IMAGES ----
+    # --- LOADING THE IMAGES ----
 
-# desired size of the output image
-# TODO Create image size handler class
-imsize = int(input("Image Size: "))
+    # desired size of the output image
+    # TODO Create image size handler class
+    imsize = int(input("Image Size: "))
 
-loader = transforms.Compose([
-    transforms.Resize(imsize),  # scale imported image
-    transforms.ToTensor()])  # transform it into a torch tensor
-style_path = input("Path to Style: ")
-content_path = input("Path to Content: ")
+    loader = transforms.Compose([
+        transforms.Resize(imsize),  # scale imported image
+        transforms.ToTensor()])  # transform it into a torch tensor
+    style_path = input("Path to Style: ")
+    content_path = input("Path to Content: ")
 
-style_img = image_loader(style_path)
-content_img = image_loader(content_path)
+    style_img = image_loader(style_path)
+    content_img = image_loader(content_path)
 
-assert style_img.size() == content_img.size(), \
-    "we need to import style and content imsages of the same size"
+    assert style_img.size() == content_img.size(), \
+        "we need to import style and content imsages of the same size"
 
-unloader = transforms.ToPILImage()  # reconvert into PIL image
+    unloader = transforms.ToPILImage()  # reconvert into PIL image
 
-plt.ion()
+    plt.ion()
 
-plt.figure()
-imshow(style_img, title='Style Image')
+    plt.figure()
+    imshow(style_img, title='Style Image')
 
-plt.figure()
-imshow(content_img, title='Content Image')
+    plt.figure()
+    imshow(content_img, title='Content Image')
 
-# --- LOSS FUNCTIONS ---
+    # --- LOSS FUNCTIONS ---
 
+    # --- IMPORTING THE MODEL ---
 
-# --- IMPORTING THE MODEL ---
+    cnn = models.vgg19(pretrained=True).features.to(device).eval()
 
+    cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
+    cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
 
-cnn = models.vgg19(pretrained=True).features.to(device).eval()
+    # create a module to normalize input image so we can easily put it in a
+    # nn.Sequential
 
-cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
-cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
+    # desired depth layers to compute style/content losses :
+    content_layers_default = ['conv_4']
+    style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
 
-# create a module to normalize input image so we can easily put it in a
-# nn.Sequential
+    input_path = input("Input Image Path or 'noise': ")
 
+    if input_path == "noise":
+        input_img = torch.randn(content_img.data.size(), device=device)
+    else:
+        input_img = image_loader(input_path)
 
-# desired depth layers to compute style/content losses :
-content_layers_default = ['conv_4']
-style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
+    # select the input image
+    # input_img = content_img.clone()
+    # if you want to use white noise instead uncomment the below line:
 
+    # add the original input image to the figure:
+    plt.figure()
+    imshow(input_img, title='Input Image')
 
-input_path = input("Input Image Path or 'noise': ")
+    # --- GRADIENT DESCENT ---
 
-if input_path == "noise":
-    input_img = torch.randn(content_img.data.size(), device=device)
-else:
-    input_img = image_loader(input_path)
+    # --- RUNNING THE ALGORITHM ---
 
-# select the input image
-# input_img = content_img.clone()
-# if you want to use white noise instead uncomment the below line:
+    num_steps = int(input("Number of Steps: "))
+    output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
+                                content_img, style_img, input_img, content_layers_default, style_layers_default, num_steps)
 
-# add the original input image to the figure:
-plt.figure()
-imshow(input_img, title='Input Image')
+    imshow(output, title='Output Image')
+    imsave('output/output.jpg', output)
 
-# --- GRADIENT DESCENT ---
+    # sphinx_gallery_thumbnail_number = 4
+    # plt.ioff()
+    # plt.show()
 
-
-# --- RUNNING THE ALGORITHM ---
-
-
-num_steps = int(input("Number of Steps: "))
-output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
-                            content_img, style_img, input_img, content_layers_default, style_layers_default, num_steps)
-
-imshow(output, title='Output Image')
-imsave('output/output.jpg', output)
-
-# sphinx_gallery_thumbnail_number = 4
-# plt.ioff()
-# plt.show()
-
-input("Press enter to continue...")
+    input("Press enter to continue...")
