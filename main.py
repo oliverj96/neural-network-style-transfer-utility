@@ -33,6 +33,8 @@ class ContentLoss(nn.Module):
         return input
 
 
+# create a module to normalize input image so we can easily put it in a
+# nn.Sequential
 class Normalization(nn.Module):
     def __init__(self, mean, std):
         super(Normalization, self).__init__()
@@ -66,7 +68,7 @@ def image_loader(image_name):
     return image.to(device, torch.float)
 
 
-def imshow(tensor, title=None):
+def imshow(tensor, unloader, title=None):
     image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
     image = image.squeeze(0)  # remove the fake batch dimension
     image = unloader(image)
@@ -76,7 +78,7 @@ def imshow(tensor, title=None):
     plt.pause(0.001)  # pause a bit so that plots are updated
 
 
-def imsave(path, tensor):
+def imsave(path, unloader, tensor):
     image = tensor.cpu().clone()
     image = image.squeeze(0)
     image = unloader(image)
@@ -228,13 +230,12 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # --- LOADING THE IMAGES ----
-
     # desired size of the output image
     # TODO Create image size handler class
     imsize = int(input("Image Size: "))
 
     loader = transforms.Compose([
-        transforms.Resize(imsize),  # scale imported image
+        transforms.Resize(imsize),  # scale imported image on shortest length
         transforms.ToTensor()])  # transform it into a torch tensor
     style_path = input("Path to Style: ")
     content_path = input("Path to Content: ")
@@ -242,6 +243,7 @@ if __name__ == "__main__":
     style_img = image_loader(style_path)
     content_img = image_loader(content_path)
 
+    # TODO remove once image size class is implemented
     assert style_img.size() == content_img.size(), \
         "we need to import style and content imsages of the same size"
 
@@ -250,22 +252,16 @@ if __name__ == "__main__":
     plt.ion()
 
     plt.figure()
-    imshow(style_img, title='Style Image')
+    imshow(style_img, unloader, title='Style Image')
 
     plt.figure()
-    imshow(content_img, title='Content Image')
-
-    # --- LOSS FUNCTIONS ---
+    imshow(content_img, unloader, title='Content Image')
 
     # --- IMPORTING THE MODEL ---
-
     cnn = models.vgg19(pretrained=True).features.to(device).eval()
 
     cnn_normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(device)
     cnn_normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(device)
-
-    # create a module to normalize input image so we can easily put it in a
-    # nn.Sequential
 
     # desired depth layers to compute style/content losses :
     content_layers_default = ['conv_4']
@@ -278,27 +274,21 @@ if __name__ == "__main__":
     else:
         input_img = image_loader(input_path)
 
-    # select the input image
-    # input_img = content_img.clone()
-    # if you want to use white noise instead uncomment the below line:
-
     # add the original input image to the figure:
     plt.figure()
     imshow(input_img, title='Input Image')
 
-    # --- GRADIENT DESCENT ---
-
     # --- RUNNING THE ALGORITHM ---
-
     num_steps = int(input("Number of Steps: "))
     output = run_style_transfer(cnn, cnn_normalization_mean, cnn_normalization_std,
                                 content_img, style_img, input_img, content_layers_default, style_layers_default, num_steps)
 
+    # TODO change output with file path handler
     imshow(output, title='Output Image')
     imsave('output/output.jpg', output)
 
     # sphinx_gallery_thumbnail_number = 4
-    # plt.ioff()
-    # plt.show()
+    plt.ioff()
+    plt.show()
 
     input("Press enter to continue...")
