@@ -1,11 +1,11 @@
-
+# Logs and Cache
 *.log
-
 *.cache
+__pycache__/
 
+# Debug output folders
 run/
-
 output/
 
+# VSC settings
 /.vscode
-buglist.md
