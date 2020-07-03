@@ -3,25 +3,20 @@ from __future__ import print_function
 # packages for neural networks with PyTorch
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim   # efficient gradient descents
 
 # load and display images
 from PIL import Image
 import matplotlib.pyplot as plt
 
-import torchvision.transforms as transforms  # trans PIL imgs into tensors
-import torchvision.models as models  # train/load pre-trained models
-
 import copy  # to deep copy models
 
 from LossFunctions import ContentLoss
 from LossFunctions import StyleLoss
 
+
 # create a module to normalize input image so we can easily put it in a
 # nn.Sequential
-
-
 class Normalization(nn.Module):
     def __init__(self, mean, std):
         super(Normalization, self).__init__()
