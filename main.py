@@ -1,20 +1,14 @@
-from __future__ import print_function
+import sys
 import os
 
 # packages for neural networks with PyTorch
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim   # efficient gradient descents
 
 # load and display images
-from PIL import Image
 import matplotlib.pyplot as plt
 
 import torchvision.transforms as transforms  # trans PIL imgs into tensors
 import torchvision.models as models  # train/load pre-trained models
-
-import copy  # to deep copy models
 
 from LossFunctions import ContentLoss
 from LossFunctions import StyleLoss
@@ -24,6 +18,10 @@ from ImageHandler import ImageHandler as img_handler
 
 
 if __name__ == "__main__":
+    args = (sys.argv)[1:]  # Get env arguments
+    run_saves = '--runs' in args  # Save all steps into folder
+    plt_prvs = '--preview' in args  # Use PLT to show previews during execution
+
     # running on a gpu would provide better performance/results, but a cpu will
     # work if that's all we have accessible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,13 +53,13 @@ if __name__ == "__main__":
 
     unloader = transforms.ToPILImage()  # reconvert into PIL image
 
-    plt.ion()
+    if plt_prvs:
+        plt.ion()
+        plt.figure()
+        img_handler.imshow(style_img, unloader, title='Style Image')
 
-    plt.figure()
-    img_handler.imshow(style_img, unloader, title='Style Image')
-
-    plt.figure()
-    img_handler.imshow(content_img, unloader, title='Content Image')
+        plt.figure()
+        img_handler.imshow(content_img, unloader, title='Content Image')
 
     # --- IMPORTING THE MODEL ---
     cnn = models.vgg19(pretrained=True).features.to(device).eval()
@@ -95,11 +93,11 @@ if __name__ == "__main__":
                              style_img, content_img, style_layers=style_layers_default, content_layers=content_layers_default)
     output = style_model.run_style_transfer(input_img=input_img)
 
-    # imshow(output, unloader, title='Output Image')
+    # --- SHOW AND SAVE OUTPUT ---
+    if plt_prvs:
+        img_handler.imshow(output, unloader, title='Output Image')
+        plt.ioff()
+        plt.show()
+
     img_handler.imsave(output_path, unloader, output)
-
-    # sphinx_gallery_thumbnail_number = 4
-    # plt.ioff()
-    # plt.show()
-
     input("Press enter to continue...")
