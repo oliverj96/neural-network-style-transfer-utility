@@ -35,12 +35,12 @@ if __name__ == "__main__":
     loader = transforms.Compose([
         transforms.Resize(imsize),  # scale imported image on shortest length
         transforms.ToTensor()])  # transform it into a torch tensor
-    
+
     # Verify image path
     style_path = input("Path to Style: ")
     while not os.path.isfile(style_path):
         style_path = input('E: Image not found. Path to Style: ')
-    
+
     # Verify content path
     content_path = input("Path to Content: ")
     while not os.path.isfile(content_path):
@@ -86,15 +86,17 @@ if __name__ == "__main__":
     plt.figure()
     img_handler.imshow(input_img, unloader, title='Input Image')
 
-    # --- RUNNING THE ALGORITHM ---
     num_steps = int(input("Number of Steps: "))
+    out_img = input('Save output as: ')
+    output_path = os.path.join(os.getcwd(), 'output', out_img)
+
+    # --- RUNNING THE ALGORITHM ---
     style_model = StyleModel(device, cnn, cnn_normalization_mean, cnn_normalization_std,
                              style_img, content_img, style_layers=style_layers_default, content_layers=content_layers_default)
     output = style_model.run_style_transfer(input_img=input_img)
 
-    # TODO change output with file path handler
     # imshow(output, unloader, title='Output Image')
-    img_handler.imsave('output/output.jpg', unloader, output)
+    img_handler.imsave(output_path, unloader, output)
 
     # sphinx_gallery_thumbnail_number = 4
     # plt.ioff()
