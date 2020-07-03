@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 
 # packages for neural networks with PyTorch
 import torch
@@ -52,14 +53,21 @@ if __name__ == "__main__":
 
     # --- LOADING THE IMAGES ----
     # desired size of the output image
-    # TODO Create image size handler class
     imsize = int(input("Image Size: "))
 
     loader = transforms.Compose([
         transforms.Resize(imsize),  # scale imported image on shortest length
         transforms.ToTensor()])  # transform it into a torch tensor
+    
+    # Verify image path
     style_path = input("Path to Style: ")
+    while not os.path.isfile(style_path):
+        style_path = input('E: Image not found. Path to Style: ')
+    
+    # Verify content path
     content_path = input("Path to Content: ")
+    while not os.path.isfile(content_path):
+        content_path = input('E: Image not found. Path to Content: ')
 
     style_img = image_loader(style_path)
     content_img = image_loader(content_path)
@@ -93,6 +101,8 @@ if __name__ == "__main__":
     if input_path == "noise":
         input_img = torch.randn(content_img.data.size(), device=device)
     else:
+        while not os.path.isfile(input_path):
+            input_path = input('E: Image not found. Path to input image: ')
         input_img = image_loader(input_path)
 
     # add the original input image to the figure:
