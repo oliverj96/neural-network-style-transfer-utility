@@ -20,30 +20,7 @@ from LossFunctions import ContentLoss
 from LossFunctions import StyleLoss
 from Model import Normalization
 from Model import StyleModel
-
-
-def image_loader(image_name):
-    image = Image.open(image_name)
-    # fake batch dimension required to fit network's input dimensions
-    image = loader(image).unsqueeze(0)
-    return image.to(device, torch.float)
-
-
-def imshow(tensor, unloader, title=None):
-    image = tensor.cpu().clone()  # we clone the tensor to not do changes on it
-    image = image.squeeze(0)  # remove the fake batch dimension
-    image = unloader(image)
-    plt.imshow(image)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
-
-
-def imsave(path, unloader, tensor):
-    image = tensor.cpu().clone()
-    image = image.squeeze(0)
-    image = unloader(image)
-    image.save(path)
+from ImageHandler import ImageHandler as img_handler
 
 
 if __name__ == "__main__":
@@ -69,8 +46,8 @@ if __name__ == "__main__":
     while not os.path.isfile(content_path):
         content_path = input('E: Image not found. Path to Content: ')
 
-    style_img = image_loader(style_path)
-    content_img = image_loader(content_path)
+    style_img = img_handler.image_loader(style_path)
+    content_img = img_handler.image_loader(content_path)
 
     # TODO remove once image size class is implemented
     assert style_img.size() == content_img.size(), \
@@ -81,10 +58,10 @@ if __name__ == "__main__":
     plt.ion()
 
     plt.figure()
-    imshow(style_img, unloader, title='Style Image')
+    img_handler.imshow(style_img, unloader, title='Style Image')
 
     plt.figure()
-    imshow(content_img, unloader, title='Content Image')
+    img_handler.imshow(content_img, unloader, title='Content Image')
 
     # --- IMPORTING THE MODEL ---
     cnn = models.vgg19(pretrained=True).features.to(device).eval()
@@ -103,11 +80,11 @@ if __name__ == "__main__":
     else:
         while not os.path.isfile(input_path):
             input_path = input('E: Image not found. Path to input image: ')
-        input_img = image_loader(input_path)
+        input_img = img_handler.image_loader(input_path)
 
     # add the original input image to the figure:
     plt.figure()
-    imshow(input_img, unloader, title='Input Image')
+    img_handler.imshow(input_img, unloader, title='Input Image')
 
     # --- RUNNING THE ALGORITHM ---
     num_steps = int(input("Number of Steps: "))
@@ -117,7 +94,7 @@ if __name__ == "__main__":
 
     # TODO change output with file path handler
     # imshow(output, unloader, title='Output Image')
-    imsave('output/output.jpg', unloader, output)
+    img_handler.imsave('output/output.jpg', unloader, output)
 
     # sphinx_gallery_thumbnail_number = 4
     # plt.ioff()
