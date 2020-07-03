@@ -23,7 +23,7 @@ class StyleLoss(nn.Module):
         super(StyleLoss, self).__init__()
         self.target = self._gram_matrix(target_feature).detach()
 
-    def _gram_matrix(input):
+    def _gram_matrix(self, input):
         a, b, c, d = input.size()  # a=batch size(=1)
         # b=number of feature maps
         # (c,d)=dimensions of a f. map (N=c*d)
