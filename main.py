@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 import torchvision.transforms as transforms  # trans PIL imgs into tensors
 import torchvision.models as models  # train/load pre-trained models
 
-from LossFunctions import ContentLoss
-from LossFunctions import StyleLoss
-from Model import Normalization
+# from LossFunctions import ContentLoss
+# from LossFunctions import StyleLoss
+# from Model import Normalization
 from Model import StyleModel
 from ImageHandler import ImageHandler as img_handler
 
@@ -44,8 +44,8 @@ if __name__ == "__main__":
     while not os.path.isfile(content_path):
         content_path = input('E: Image not found. Path to Content: ')
 
-    style_img = img_handler.image_loader(style_path)
-    content_img = img_handler.image_loader(content_path)
+    style_img = img_handler.image_loader(device, loader, style_path)
+    content_img = img_handler.image_loader(device, loader, content_path)
 
     # TODO remove once image size class is implemented
     assert style_img.size() == content_img.size(), \
