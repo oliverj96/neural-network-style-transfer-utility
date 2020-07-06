@@ -10,9 +10,7 @@ import matplotlib.pyplot as plt
 import torchvision.transforms as transforms  # trans PIL imgs into tensors
 import torchvision.models as models  # train/load pre-trained models
 
-# from LossFunctions import ContentLoss
-# from LossFunctions import StyleLoss
-# from Model import Normalization
+# classes from local files
 from Model import StyleModel
 from ImageHandler import ImageHandler as img_handler
 
@@ -91,7 +89,7 @@ if __name__ == "__main__":
     # --- RUNNING THE ALGORITHM ---
     style_model = StyleModel(device, cnn, cnn_normalization_mean, cnn_normalization_std,
                              style_img, content_img, style_layers=style_layers_default, content_layers=content_layers_default)
-    output = style_model.run_style_transfer(input_img=input_img)
+    output = style_model.run_style_transfer(input_img=input_img, unloader=unloader, prev=plt_prvs)
 
     # --- SHOW AND SAVE OUTPUT ---
     if plt_prvs:

@@ -6,14 +6,14 @@ import torch.nn as nn
 import torch.optim as optim   # efficient gradient descents
 
 # load and display images
-from PIL import Image
-import matplotlib.pyplot as plt
+# from PIL import Image
+# import matplotlib.pyplot as plt
 
 import copy  # to deep copy models
 
 from LossFunctions import ContentLoss
 from LossFunctions import StyleLoss
-
+from ImageHandler import ImageHandler as img_handler
 
 # create a module to normalize input image so we can easily put it in a
 # nn.Sequential
@@ -109,8 +109,8 @@ class StyleModel:
         optimizer = optim.LBFGS([input_img.requires_grad_()])
         return optimizer
 
-    def run_style_transfer(self, input_img, num_steps=300,
-                           style_weight=1000000, content_weight=1):
+    def run_style_transfer(self, input_img, unloader, num_steps=300,
+                           style_weight=1000000, content_weight=1, prev=False):
         """Run the style transfer."""
         print('Building the style transfer model..')
         model, style_losses, content_losses = self.get_style_model_and_losses()
@@ -146,8 +146,9 @@ class StyleModel:
                     print('Style Loss : {:4f} Content Loss: {:4f}'.format(
                         style_score.item(), content_score.item()))
                     print()
-                    # imshow(input_img, title='Run {}'.format(run))
-                    # imsave('run/run{}.jpg'.format(run), input_img)
+                    if prev:
+                        img_handler.imshow(input_img, unloader, title='Run {}'.format(run))
+                        # img_handler.imsave('run/run{}.jpg'.format(run), input_img)
                 return style_score + content_score
             optimizer.step(closure)
         # a last correction...
