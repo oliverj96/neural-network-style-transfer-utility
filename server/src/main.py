@@ -78,18 +78,25 @@ if __name__ == "__main__":
             input_path = input('E: Image not found. Path to input image: ')
         input_img = img_handler.image_loader(input_path)
 
-    # add the original input image to the figure:
-    plt.figure()
-    img_handler.imshow(input_img, unloader, title='Input Image')
-
     num_steps = int(input("Number of Steps: "))
     out_img = input('Save output as: ')
-    output_path = os.path.join(os.getcwd(), 'output', out_img)
+    output_path = os.path.join(os.getcwd(), 'output')
+    output_path = os.path.join(output_path, out_img)
+    print(f'Output path: {output_path}')
+
+    # add the original input image to the figure:
+    if plt_prvs:
+        plt.figure()
+        img_handler.imshow(input_img, unloader, title='Input Image')
 
     # --- RUNNING THE ALGORITHM ---
-    style_model = StyleModel(device, cnn, cnn_normalization_mean, cnn_normalization_std,
-                             style_img, content_img, style_layers=style_layers_default, content_layers=content_layers_default)
-    output = style_model.run_style_transfer(input_img=input_img, unloader=unloader, prev=plt_prvs)
+    style_model = StyleModel(device, cnn, cnn_normalization_mean,
+                             cnn_normalization_std, style_img,
+                             content_img, style_layers=style_layers_default,
+                             content_layers=content_layers_default)
+    output = style_model.run_style_transfer(input_img=input_img,
+                                            unloader=unloader,
+                                            prev=plt_prvs, runs=run_saves)
 
     # --- SHOW AND SAVE OUTPUT ---
     if plt_prvs:

@@ -4,8 +4,8 @@
 __pycache__/
 
 # Debug output folders
-run/
-output/
+server/src/run/
+server/src/output/
 
 # VSC settings
 /.vscode

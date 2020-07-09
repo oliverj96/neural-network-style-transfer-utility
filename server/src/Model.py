@@ -1,4 +1,5 @@
 from __future__ import print_function
+import os
 
 # packages for neural networks with PyTorch
 import torch
@@ -110,7 +111,7 @@ class StyleModel:
         return optimizer
 
     def run_style_transfer(self, input_img, unloader, num_steps=300,
-                           style_weight=1000000, content_weight=1, prev=False):
+                           style_weight=1000000, content_weight=1, prev=False, runs=False):
         """Run the style transfer."""
         print('Building the style transfer model..')
         model, style_losses, content_losses = self.get_style_model_and_losses()
@@ -118,6 +119,13 @@ class StyleModel:
 
         print('Optimizing..')
         run = [0]
+        run_path = ''
+        if runs:
+            # Set directory
+            run_path = os.path.join(os.getcwd(), 'run')
+            # Check for directory
+            if not os.path.isdir(run_path):
+                os.mkdir(run_path)
         while run[0] <= num_steps:
 
             def closure():
@@ -148,7 +156,9 @@ class StyleModel:
                     print()
                     if prev:
                         img_handler.imshow(input_img, unloader, title='Run {}'.format(run))
-                        # img_handler.imsave('run/run{}.jpg'.format(run), input_img)
+                    if runs:
+                        run_save = os.path.join(run_path, f'run{run}.jpg')
+                        img_handler.imsave(run_save, unloader, input_img)
                 return style_score + content_score
             optimizer.step(closure)
         # a last correction...
