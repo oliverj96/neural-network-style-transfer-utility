@@ -1,0 +1,17 @@
+.imagespace{
+    padding: 1em;
+}
+
+#imageupload{
+    height: 10em;
+    width: 10em;
+    background-color: #d8d8d8;
+    margin: 1em;
+}
+
+#imageout{
+    height: 20em;
+    width: 20em;
+    background-color: #d8d8d8;
+    margin: 1em;
+}

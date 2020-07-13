@@ -1,20 +1,16 @@
 from __future__ import print_function
 import os
+import copy  # to deep copy models
 
 # packages for neural networks with PyTorch
 import torch
 import torch.nn as nn
 import torch.optim as optim   # efficient gradient descents
 
-# load and display images
-# from PIL import Image
-# import matplotlib.pyplot as plt
-
-import copy  # to deep copy models
-
 from LossFunctions import ContentLoss
 from LossFunctions import StyleLoss
 from ImageHandler import ImageHandler as img_handler
+
 
 # create a module to normalize input image so we can easily put it in a
 # nn.Sequential
@@ -33,7 +29,8 @@ class Normalization(nn.Module):
 
 
 class StyleModel:
-    def __init__(self, device, cnn, normalization_mean, normalization_std, style_img, content_img, style_layers, content_layers):
+    def __init__(self, device, cnn, normalization_mean, normalization_std,
+                 style_img, content_img, style_layers, content_layers):
         self.device = device
         self.cnn = cnn
         self.normalization_mean = normalization_mean
@@ -68,7 +65,7 @@ class StyleModel:
                 name = 'relu_{}'.format(i)
                 # The in-place version doesn't play
                 # very nicely with the ContentLoss
-                # and StyleLoss we insert below. So we replace with out-of-place
+                # StyleLoss we insert below. So we replace with out-of-place
                 # ones here.
                 layer = nn.ReLU(inplace=False)
             elif isinstance(layer, nn.MaxPool2d):
@@ -98,7 +95,8 @@ class StyleModel:
         # now we trim off the layers after
         # the last content and style losses
         for i in range(len(model) - 1, -1, -1):
-            if isinstance(model[i], ContentLoss) or isinstance(model[i], StyleLoss):
+            if isinstance(model[i], ContentLoss) or \
+               isinstance(model[i], StyleLoss):
                 break
 
         model = model[:(i + 1)]
@@ -111,7 +109,8 @@ class StyleModel:
         return optimizer
 
     def run_style_transfer(self, input_img, unloader, num_steps=300,
-                           style_weight=1000000, content_weight=1, prev=False, runs=False):
+                           style_weight=1000000, content_weight=1,
+                           prev=False, runs=False):
         """Run the style transfer."""
         print('Building the style transfer model..')
         model, style_losses, content_losses = self.get_style_model_and_losses()
@@ -155,7 +154,8 @@ class StyleModel:
                         style_score.item(), content_score.item()))
                     print()
                     if prev:
-                        img_handler.imshow(input_img, unloader, title='Run {}'.format(run))
+                        img_handler.imshow(input_img, unloader,
+                                           title='Run {}'.format(run))
                     if runs:
                         run_save = os.path.join(run_path, f'run{run}.jpg')
                         img_handler.imsave(run_save, unloader, input_img)
