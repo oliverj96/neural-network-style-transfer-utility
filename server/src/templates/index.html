@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Open Stylizer</title>
     <!-- CSS only -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <!-- Title Section -->
     <div class="jumbotron">
-        <h1 class="display-4">Open Stylizer</h1>
-        <p class="lead">[Insert information here]</p>
-        <hr class="my-4">
-        <p>Insert instructions here</p>
-        <a class="btn btn-primary btn-lg" href="#" role="button">GitHub</a>
-      </div>
+      <h1 class="display-4">Open Stylizer</h1>
+      <p class="lead">An open source neural network for style transfer.</p>
+      <hr class="my-4" />
+      <p>Upload your content photo and your style photo, the click process!</p>
+      <a
+        class="btn btn-primary btn-lg"
+        href="https://github.com/oliverj96/open-stylizer"
+        target="blank"
+        role="button"
+        >GitHub</a
+      >
+    </div>
 
-    <!-- Upload Image Section -->
-    <div class="imagespace">
-        <div id="imageupload">
+    <!-- Upload Images Section -->
+    <div id="imagesection">
+        <div class="imagespace">
+          <div id="imageupload"></div>
+          <button type="button" class="btn btn-dark">Upload Image</button>
         </div>
-        <button type="button" class="btn btn-dark">Upload Image</button>
+          <div id="imageupload"></div>
+          <button type="button" class="btn btn-dark">Upload Image</button>
+        </div>
+
     </div>
 
     <!-- Output Image Section -->
-    <div id="imageout">
-    </div>
-</body>
+    <div id="imageout"></div>
+  </body>
 </html>
